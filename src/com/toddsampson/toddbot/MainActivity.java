@@ -3,6 +3,7 @@ package com.toddsampson.toddbot;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,6 +31,15 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 		setContentView(R.layout.activity_main);
+		
+		for(int x = 1; x < 20; x = x+1) {
+			try {
+				sendMessage('F');
+				Thread.sleep(1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -61,5 +71,20 @@ public class MainActivity extends Activity {
 		} else {
 			Log.d(Tag, "didn't connect");
 		}
+	}
+	
+	private void sendMessage(char direction) {
+		byte[] buffer = new byte[2];
+
+		buffer[0] = (byte) 0x2;
+		buffer[1] = (byte) 0x46;
+        if (mOutput != null && buffer[1] != -1) {
+            try {
+                mOutput.write(buffer);
+            } catch (IOException e) {
+                Log.e(Tag, "write failed", e);
+            }
+        }
+	
 	}
 }
