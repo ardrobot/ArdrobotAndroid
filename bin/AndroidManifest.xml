@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.toddsampson.toddbot"
+    package="com.ardrobot.android"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,8 +9,7 @@
         android:targetSdkVersion="17" />
 
    <uses-feature
-        android:name="android.hardware.usb.accessory"
-        android:required="true" />
+        android:name="android.hardware.usb.accessory" />
 
    <application
         android:allowBackup="true"
@@ -20,22 +19,13 @@
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name="com.toddsampson.toddbot.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
-        <activity
-            android:name="com.toddsampson.toddbot.USBAccessoryActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:taskAffinity=""
-            android:exported="false" >
-            <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
 
