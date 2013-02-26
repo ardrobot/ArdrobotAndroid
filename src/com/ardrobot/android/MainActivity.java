@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 		
 		// Temp sending data to Arduino
 		byte[] buffer = new byte[1];
-		buffer[0] = 1;
+		buffer[0] = 'F';
 
 		try {
 			Log.i("Ardrobot", "mv");
