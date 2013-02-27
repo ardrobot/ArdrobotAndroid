@@ -3,18 +3,21 @@ package com.ardrobot.android;
 import java.io.IOException;
 import java.net.URI;
 
+import android.hardware.Camera;
 import org.ros.address.InetAddressFactory;
 import org.ros.android.MessageCallable;
 import org.ros.android.RosActivity;
 import org.ros.android.view.RosTextView;
+import org.ros.android.view.camera.RosCameraPreviewView;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 import org.ros.rosjava_tutorial_pubsub.Listener;
 
-
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.ardrobot.androidopenaccessory.AndroidOpenAccessory;
 import com.ardrobot.androidopenaccessory.UsbConnection;
@@ -28,6 +31,8 @@ public class MainActivity extends RosActivity {
 	private RosTextView<geometry_msgs.Twist> rosTextView;
 	private Listener listener;
 	private byte direction;
+	private int cameraId;
+	private RosCameraPreviewView rosCameraPreviewView;
 
 
 
@@ -40,7 +45,11 @@ public class MainActivity extends RosActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
+	    rosCameraPreviewView = (RosCameraPreviewView) findViewById(R.id.ros_camera_preview_view);
+
 
 		mUsbManager = (UsbManager) getSystemService(USB_SERVICE);
 		connection = new UsbConnection(this, mUsbManager);
@@ -145,6 +154,12 @@ public class MainActivity extends RosActivity {
 		// The RosTextView is also a NodeMain that must be executed in order to
 		// start displaying incoming messages.
 		nodeMainExecutor.execute(rosTextView, nodeConfiguration);
+		
+		
+	    cameraId = 0;
+	    rosCameraPreviewView.setCamera(Camera.open(cameraId));
+	    nodeMainExecutor.execute(rosCameraPreviewView, nodeConfiguration);
+
 	}
 
 }

@@ -8,18 +8,21 @@
         android:minSdkVersion="13"
         android:targetSdkVersion="17" />
     
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    
-   <uses-feature
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-feature
         android:name="android.hardware.usb.accessory" />
 
    <application
-        android:allowBackup="true"
-        android:hardwareAccelerated="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+       android:allowBackup="true"
+       android:configChanges="orientation|keyboardHidden"
+       android:hardwareAccelerated="true"
+       android:icon="@drawable/ic_launcher"
+       android:label="@string/app_name" >
 
         <activity
             android:name=".MainActivity"
@@ -36,10 +39,10 @@
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/usb_accessory_filter" />
         </activity>
-        
-        <service android:name="org.ros.android.NodeMainExecutorService" />
-        
+
         <activity android:name="org.ros.android.MasterChooser" />
+
+        <service android:name="org.ros.android.NodeMainExecutorService" />
     
     </application>
 
