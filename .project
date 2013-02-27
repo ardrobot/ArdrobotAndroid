@@ -3,6 +3,7 @@
 	<name>ArdrobotAndroid</name>
 	<comment></comment>
 	<projects>
+		<project>RosPubSub</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

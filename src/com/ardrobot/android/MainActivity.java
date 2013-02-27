@@ -1,8 +1,17 @@
 package com.ardrobot.android;
 
 import java.io.IOException;
+import java.net.URI;
 
-import android.app.Activity;
+import org.ros.address.InetAddressFactory;
+import org.ros.android.MessageCallable;
+import org.ros.android.RosActivity;
+import org.ros.android.view.RosTextView;
+import org.ros.node.NodeConfiguration;
+import org.ros.node.NodeMainExecutor;
+import org.ros.rosjava_tutorial_pubsub.Listener;
+
+
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,11 +20,22 @@ import com.ardrobot.androidopenaccessory.AndroidOpenAccessory;
 import com.ardrobot.androidopenaccessory.UsbConnection;
 
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends RosActivity {
 	private AndroidOpenAccessory mAccessory;
 	private UsbManager mUsbManager;
 	private UsbConnection connection;
-	
+	private RosTextView<geometry_msgs.Twist> rosTextView;
+	private Listener listener;
+	private byte direction;
+
+
+
+	public MainActivity() {
+		super("Ardrobot", "Ardrobot");
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,6 +45,13 @@ public class MainActivity extends Activity {
 		mUsbManager = (UsbManager) getSystemService(USB_SERVICE);
 		connection = new UsbConnection(this, mUsbManager);
 		mAccessory = new AndroidOpenAccessory(this);
+		
+		
+		rosTextView = (RosTextView<geometry_msgs.Twist>) findViewById(R.id.text);
+		rosTextView.setTopicName("cmd_vel");
+		rosTextView.setMessageType(geometry_msgs.Twist._TYPE);
+
+
 	}
 	
 	@Override
@@ -41,17 +68,52 @@ public class MainActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		// Temp sending data to Arduino
-		byte[] buffer = new byte[1];
-		buffer[0] = 'F';
 
-		try {
-			Log.i("Ardrobot", "mv");
-			mAccessory.publish("mv", buffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+		
+		
+		
+		rosTextView.setMessageToStringCallable(new MessageCallable<String, geometry_msgs.Twist>() {
+			@Override
+			public String call(geometry_msgs.Twist message) {
+
+				if (message.getLinear().getX() > 0) {
+					Log.i("Direction", "Forward");
+					direction = 'F';
+				} else if (message.getLinear().getX() < 0) {
+					Log.i("Direction", "Backward");
+					direction = 'B';
+				} else if (message.getLinear().getY() < 0) {
+					Log.i("Direction", "Right");
+					direction = 'R';
+				} else if (message.getLinear().getY() > 0) {
+					Log.i("Direction", "Left");
+					direction = 'L';
+				} else {
+					Log.i("Direction", "Stop");
+					direction = 'S';
+				}
+				
+				
+				byte[] buffer = new byte[1];
+				buffer[0] = direction;
+				
+				try {
+					Log.i("Ardrobot", "mv");
+					mAccessory.publish("mv", buffer);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				
+				
+				String coords = String.valueOf(message.getLinear().getX()) + " : " + String.valueOf(message.getLinear().getY());
+				return coords;
+			}
+		});
+
+		
+		
 	}
 
 	@Override
@@ -65,4 +127,24 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	@Override
+	protected void init(NodeMainExecutor nodeMainExecutor) {
+		listener = new Listener();
+
+
+		NodeConfiguration nodeConfiguration =
+				NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress());
+
+		URI MyURI = URI.create("http://10.8.0.1:11311");
+
+		//	    NodeConfiguration nodeConfiguration = NodeConfiguration.newPrivate();
+		// At this point, the user has already been prompted to either enter the URI
+		// of a master to use or to start a master locally.
+		nodeConfiguration.setMasterUri(MyURI);
+		nodeMainExecutor.execute(listener, nodeConfiguration);
+		// The RosTextView is also a NodeMain that must be executed in order to
+		// start displaying incoming messages.
+		nodeMainExecutor.execute(rosTextView, nodeConfiguration);
+	}
+
 }
