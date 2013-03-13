@@ -24,7 +24,7 @@ import android.view.WindowManager;
 import com.ardrobot.androidopenaccessory.AndroidOpenAccessory;
 import com.ardrobot.androidopenaccessory.UsbConnection;
 
-public class MainActivity extends RosActivity {
+public class ArdrobotAndroid extends RosActivity {
 	
 	private static final String MASTER_URI = "http://10.8.0.1:11311";
 
@@ -39,7 +39,7 @@ public class MainActivity extends RosActivity {
 	private int cameraId;
 	private RosCameraPreviewView rosCameraPreviewView;
 
-	public MainActivity() {
+	public ArdrobotAndroid() {
 		super("Ardrobot", "Ardrobot");
 	}
 
